@@ -1,9 +1,8 @@
-# Root workspace for the Kaspa Forge Deal Recovery Kit. Build the CLI from here:
-#   cargo build --release --locked -p dealctl        # -> target/release/dealctl
+# Root workspace for the Kaspa Forge Deal Recovery Kit:
+#   cargo build --release --locked -p dealctl
 [workspace]
 resolver = "2"
 members = ["crates/kaspa-forge-contracts", "cli/dealctl"]
 
-# Overflow checks in release at the workspace root (member profiles are ignored in a workspace).
 [profile.release]
 overflow-checks = true

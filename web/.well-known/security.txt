@@ -1,7 +1,0 @@
-# Kaspa Forge (Kaspa Safe · Kaspa Escrow · Marketplace) — security contact
-# RFC 9116. Report vulnerabilities privately; please do not disclose publicly first.
-Contact: mailto:kaspa@officeforge.co
-Expires: 2027-07-11T00:00:00.000Z
-Policy: https://kaspaforge.org/security.html
-Preferred-Languages: en, ru
-Canonical: https://kaspaforge.org/.well-known/security.txt

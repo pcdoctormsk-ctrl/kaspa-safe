@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-silverscript-lang = { git = "https://github.com/kaspanet/silverscript", rev = "d25bd3427a093c17327ca3d6b9e1aa5f7688c863" }
+silverscript-lang = { git = "https://github.com/kaspanet/silverscript", rev = "26e3b9f94821b6fe47a2492755252ec4f995abb1" }
 kaspa-consensus-core = { git = "https://github.com/kaspanet/rusty-kaspa", tag = "v2.0.1" }
 kaspa-addresses = { git = "https://github.com/kaspanet/rusty-kaspa", tag = "v2.0.1" }
 kaspa-hashes = { git = "https://github.com/kaspanet/rusty-kaspa", tag = "v2.0.1" }

@@ -1,9 +1,0 @@
-node_modules/
-src-tauri/target/
-src-tauri/gen/
-dist/
-web/
-*.apk
-*.aab
-*.keystore
-*.jks

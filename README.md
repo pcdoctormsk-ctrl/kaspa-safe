@@ -1,64 +1,31 @@
-# Kaspa Forge — contracts, apps and recovery kit
+# Kaspa Forge — Independent Recovery
 
-This is the public source mirror behind
-**Kaspa Forge — Safe + Escrow + Deposit + Market + Boards + Desk**, built on Kaspa Toccata
-covenants.
+This repository is the recovery-only public source package for
+[Kaspa Forge](https://kaspaforge.org). It lets users recover funds from an existing Kaspa Safe,
+Escrow or Deposit without the Kaspa Forge website, hosted API or operator infrastructure.
 
-- **[Safe](https://kaspaforge.org/safe.html)** — a vault for KAS. Every withdrawal waits out
-  a delay you set and can be cancelled with a separate alarm key.
-- **[Escrow](https://kaspaforge.org/escrow-index.html)** — non-custodial escrow for P2P deals.
-- **[Deposit](https://kaspaforge.org/deposit-index.html)** — non-custodial security deposits with
-  a fixed term, a claim window and covenant-enforced settlement paths.
-- **[Market](https://kaspaforge.org/market.html)** — a marketplace powered by Kaspa payments
-  and escrow.
-- **[Boards](https://kaspaforge.org/boards.html)** — signed on-chain threads with a standalone,
-  infrastructure-neutral KBRD indexer in this repository.
-- **[Desk](https://kaspaforge.org/desk.html)** — the browser workspace for the wallet, safes,
-  escrow deals, deposits, listings and opt-in encrypted profile sync.
+It intentionally contains only:
 
-## What is recoverable without Kaspa Forge
-
-The current backup format is one passphrase-encrypted Desk profile (`.age`). It replaces the old
-per-vault and per-deal text recovery sheets. Keep the `.age` file, its password, and any separate
-Safe alarm cards offline.
-
-This repository contains:
-
-- [`web/keyfile-decrypt.html`](web/keyfile-decrypt.html) — a self-contained offline decryptor for
-  the Desk `.age` backup. Its WebAssembly core is embedded in the HTML; it loads no scripts,
-  fonts or code from the network.
-- [`vaultctl/`](vaultctl/) — the complete standalone Safe recovery CLI. It can inspect and operate
-  a vault against any Kaspa v2+ node with `--utxoindex`, without the Kaspa Forge website or API.
-- [`recovery-kit/`](recovery-kit/) — the standalone Escrow + Deposit recovery package: the shared
-  Rust transaction core, `dealctl`, versioned schemas, deterministic vectors, EN/RU guides and the
-  offline `.age` decryptor. It contains no Kaspa Forge server, hosted API or operator surface.
-- [`contracts/vault.sil`](contracts/vault.sil) and
-  [`contracts/escrow.sil`](contracts/escrow.sil) — the on-chain covenant sources.
-- [`board-indexer/`](board-indexer/) — the standalone MIT KBRD v1/v2 indexer: BIP340 verification,
-  deterministic SQLite projection, Kaspa gRPC scanner and read-only API. It contains no hosted
-  image storage, classifier, reports, messaging, operator/admin surface, infrastructure config or
-  secrets.
-- [`web/`](web/) and [`app/`](app/) — the browser frontend and Android wrapper source.
-- [`RECOVERY-SHA256SUMS`](RECOVERY-SHA256SUMS) — Safe recovery checksums; the Deal Recovery Kit has
-  its own complete manifest at
+- [`contracts/`](contracts/) — the published `vault.sil` and `escrow.sil` covenant sources;
+- [`vaultctl/`](vaultctl/) — the standalone Safe recovery CLI;
+- [`recovery-kit/`](recovery-kit/) — the Escrow and Deposit transaction core, `dealctl`, schemas,
+  test vectors, EN/RU guides and self-contained offline `.age` decryptor;
+- [`RECOVERY-SHA256SUMS`](RECOVERY-SHA256SUMS) — checksums for the root recovery boundary. The Deal
+  Recovery Kit also has its complete package manifest at
   [`recovery-kit/RECOVERY-SHA256SUMS`](recovery-kit/RECOVERY-SHA256SUMS).
 
-Both product families now have standalone recovery tools: `vaultctl` for Safe and `dealctl` for
-Escrow/Deposit. Build them from this repository and verify the matching checksum manifest; do not
-rely on cached or third-party binaries.
-
-The Boards index can be rebuilt only across history available from the connected node. A normal
-pruned node does not retain the full chain history; use an archival source or retain a current
-SQLite backup for a complete long-running index. KBRD stores only an image hash on-chain, never
-the image bytes or moderation state.
+The website, blog, Desk/application source, Boards indexer, server, image storage, NSFW model,
+reports, Telegram integration, operator/admin APIs, deployment configuration, infrastructure and
+secrets are outside this repository by design.
 
 ## Keep an offline copy now
 
-1. Use **Code → Download ZIP** on this repository and store the ZIP with your encrypted `.age`
-   backup. Do not wait for an emergency.
-2. Extract the ZIP and open `web/keyfile-decrypt.html` from disk once with networking disabled.
-3. Confirm that it accepts a test/exported `.age` backup and offers **Download decrypted JSON**.
-4. Delete the plaintext JSON after the rehearsal. It contains private keys.
+1. Use **Code → Download ZIP** and store the ZIP with your encrypted Desk `.age` backup. Do not
+   wait for an emergency.
+2. Verify `RECOVERY-SHA256SUMS`.
+3. With networking disabled, open `recovery-kit/keyfile-decrypt.html` from disk and rehearse with
+   a test/exported `.age` backup.
+4. Delete the decrypted JSON after the rehearsal. It contains private keys.
 
 The key file is standard passphrase-encrypted [age](https://age-encryption.org/) data. Technical
 users may also decrypt it with:
@@ -67,34 +34,12 @@ users may also decrypt it with:
 age -d kaspa-office-profile.age > profile.json
 ```
 
-## Emergency quickstart — Safe
+Never upload the `.age` file or decrypted JSON to an online decryptor, and never send either one,
+your password or a private key to support.
 
-### 1. Decrypt the Desk backup offline
+## Safe recovery
 
-Disconnect the computer from the network, open `web/keyfile-decrypt.html`, choose the `.age` file,
-enter its password, and click **Download decrypted JSON**. The result is `profile.json`.
-
-The decryptor is deliberately a single local HTML file. The password, encrypted backup and
-plaintext profile stay in that browser window. Never upload the `.age` file or plaintext JSON to
-an online decryptor or send either file to support.
-
-### 2. Extract the vault record
-
-List the vault addresses, then select the record whose `vault_addr` matches your vault:
-
-```bash
-jq -r '.vaults[] | .vault_addr' profile.json
-jq '.vaults[] | select(.vault_addr == "kaspa:YOUR_VAULT_ADDRESS")' profile.json > vault.json
-chmod 600 profile.json vault.json
-```
-
-The normal recovery input is now `vault.json`. A full `.age` export from the Safe's creation
-device includes `alarm_sk` only when you chose shared alarm-key storage. Forge Sync deliberately
-never transfers alarm keys. For separate storage, add the private key from the alarm card as the
-`alarm_sk` field before `cancel` or `migrate`. Keep hot and alarm keys apart: together they can
-move the whole vault immediately.
-
-### 3. Build and check the vault
+### Build `vaultctl`
 
 Prerequisites: Rust, `protobuf-compiler`, and `clang`.
 
@@ -103,99 +48,101 @@ Prerequisites: Rust, `protobuf-compiler`, and `clang`.
 sudo apt install -y protobuf-compiler clang
 
 cd vaultctl
-cargo build --release
+cargo build --release --locked
 ./target/release/vaultctl status --recovery ../vault.json
 ```
 
-`vaultctl` defaults to `grpc://node.kaspaforge.org:16110`. To remove that remaining service
-dependency, run your own Kaspa v2+ node with `--utxoindex` and add
+`vaultctl` defaults to `grpc://node.kaspaforge.org:16110`. For independence from that public
+front, run any compatible Kaspa v2+ node with `--utxoindex` and pass
 `--node grpc://YOUR_NODE:16110`.
 
-## Safe commands
+### Extract the Safe record offline
 
-| command | what it does | required secret |
-|---|---|---|
-| `status --recovery vault.json [--dest <addr>]` | show balance, vault age and timers; `--dest` checks a known in-flight withdrawal | none |
-| `initiate --recovery vault.json --to <kaspa:q…>` | start a delayed withdrawal; the destination becomes immutable | hot key |
-| `cancel --recovery vault.json --dest <kaspa:q…>` | cancel an in-flight withdrawal and return coins to the vault | alarm key |
-| `complete --recovery vault.json --dest <kaspa:q…>` | deliver a matured withdrawal to its fixed destination | none |
-| `checkin --recovery vault.json` | reset the inheritance timer | hot key |
-| `inherit --recovery vault.json [--heir-sk <hex>]` | claim after the inheritance period; automatic mode needs no key, manual mode needs the heir's key | none / heir key |
-| `migrate --recovery vault.json --to <kaspa:q…> [--dest <addr>]` | instantly move the entire vault; `--dest` targets an in-flight withdrawal UTXO | hot + alarm keys |
-
-Useful flags:
-
-- `--dry-run` — build and sign the transaction but do not broadcast it. Use this first.
-- `--node grpc://host:16110` — use any Kaspa v2+ node started with `--utxoindex`.
-
-For `cancel`, `complete`, or an in-flight `migrate`, `--dest` is the withdrawal destination,
-not the vault address. It is shown in the Safe panel/alert; `status --dest ...` verifies it.
-
-Delete plaintext recovery files when finished:
+Decrypt the Desk backup on a disconnected computer, then select the record whose `vault_addr`
+matches the vault:
 
 ```bash
-rm -f profile.json vault.json
+jq -r '.vaults[] | .vault_addr' profile.json
+jq '.vaults[] | select(.vault_addr == "kaspa:YOUR_VAULT_ADDRESS")' profile.json > vault.json
+chmod 600 profile.json vault.json
 ```
 
-## Verify the Safe covenant
+An `.age` export from the Safe creation device includes `alarm_sk` only when shared alarm-key
+storage was selected. Forge Sync deliberately does not transfer alarm keys. If the alarm key was
+kept separately, add it as `alarm_sk` before `cancel` or `migrate`. Keep hot and alarm keys apart:
+together they can move the entire vault immediately.
+
+### Safe commands
+
+| command | purpose | required secret |
+|---|---|---|
+| `status --recovery vault.json [--dest <addr>]` | show balance, age and timers | none |
+| `initiate --recovery vault.json --to <kaspa:q…>` | start a delayed withdrawal | hot key |
+| `cancel --recovery vault.json --dest <kaspa:q…>` | cancel an in-flight withdrawal | alarm key |
+| `complete --recovery vault.json --dest <kaspa:q…>` | deliver a matured withdrawal | none |
+| `checkin --recovery vault.json` | reset the inheritance timer | hot key |
+| `inherit --recovery vault.json [--heir-sk <hex>]` | claim after the inheritance period | none / heir key |
+| `migrate --recovery vault.json --to <kaspa:q…> [--dest <addr>]` | immediate full migration | hot + alarm keys |
+
+Use `--dry-run` before broadcasting. For `cancel`, `complete`, or an in-flight `migrate`, `--dest`
+is the fixed withdrawal destination, not the vault address.
+
+Run the covenant self-test:
 
 ```bash
 cd vaultctl
-cargo run --release -- selftest
+cargo run --release --locked -- selftest
 ```
 
-The self-test executes all contract paths, including early completion, wrong-key, wrong-destination,
-premature-inheritance, one-key-migration and two-input-siphon attacks, in the Kaspa consensus VM.
+## Escrow and Deposit recovery
 
-## Escrow and Deposit recovery boundary
-
-[`contracts/escrow.sil`](contracts/escrow.sil) is the covenant behind both Kaspa Escrow and Kaspa
-Deposit. A Deposit maps the holder to the contract buyer and the depositor to the contract seller,
-so the same constrained settlement paths can enforce a return to the depositor, a holder claim or
-a split. Every allowed path sends funds only to the buyer, seller, their split, or the fixed
-service-fee address:
+`contracts/escrow.sil` backs both Kaspa Escrow and Kaspa Deposit. A Deposit maps the holder to the
+contract buyer and the depositor to the contract seller. Every permitted path constrains funds to
+the buyer, seller, their split, or the fixed service-fee address:
 
 - `release` / `refund` — amicable outcomes;
-- `autoRelease` — seller payout after the dispute window when no dispute was opened;
+- `autoRelease` — seller payout after the dispute window;
 - `dispute` — freezes optimistic auto-release;
 - `arbitrateToBuyer`, `arbitrateToSeller`, `arbitrateSplit` — constrained arbiter outcomes;
 - `timeoutToBuyer`, `timeoutToSeller` — emergency exits after the arbiter deadline.
 
-The encrypted Desk profile contains the deal key, chat key, service token and public escrow data;
-the offline decryptor exposes those fields. While the Kaspa Forge site is available, importing the
-`.age` file into Desk restores the deal UI. Without the site, use
-[`recovery-kit/`](recovery-kit/): `dealctl` extracts and verifies one minimal deal record, queries
-any Kaspa v2+ node with `--utxoindex`, builds every party or keyless covenant path, verifies the
-exact inputs/outputs and submits a signed transaction without a Kaspa Forge API.
-
-For a real air-gapped flow, create `watch.json` from the recovery record on the offline machine,
-run `prepare --watch` on the online machine, bring only `lines.json` back for signing, then return
-the signed transaction for `submit`. The private recovery record never touches the online host.
-Follow the complete EN/RU guide and verify
-[`recovery-kit/RECOVERY-SHA256SUMS`](recovery-kit/RECOVERY-SHA256SUMS) before building.
-
-## Trust and backup boundaries
-
-- Keys are generated in the browser and encrypted in the Desk `.age` backup. Kaspa Forge does not
-  know the profile password.
-- Forge Sync stores an encrypted profile projection and deliberately strips every Safe `alarm_sk`.
-  Sync is not a replacement for a fresh full `.age` export or a separate alarm card.
-- A Safe address is a pure function of its parameters. `vaultctl status` recomputes it and reports
-  a mismatch rather than operating on a different vault.
-- Never send support your password, private keys, complete `.age` backup, `profile.json`, or
-  `vault.json`.
-
-## Android source
-
-`app/` is a Tauri 2 wrapper around the public `web/` frontend. No prebuilt Android package is
-currently distributed: old APK releases were retired because they no longer represent the current
-product. Do not install an old package from a cache or third-party mirror.
+Build `dealctl` from the recovery-kit root:
 
 ```bash
-cd app
-npm install
-cp -r ../web web
-npx tauri android init
-npx tauri icon app-icon.png
-npx tauri android build --apk
+cd recovery-kit
+sha256sum -c RECOVERY-SHA256SUMS
+cargo build --release --locked -p dealctl
+./target/release/dealctl --help
+```
+
+Read the complete guides before using it:
+
+- [`recovery-kit/recovery/README.md`](recovery-kit/recovery/README.md) — English;
+- [`recovery-kit/recovery/README.ru.md`](recovery-kit/recovery/README.ru.md) — Russian.
+
+The safe air-gapped boundary is:
+
+1. Offline: decrypt, `extract`, `verify`, then create a public `watch.json`.
+2. Online: use `status --watch` and `prepare --watch` to create `lines.json`.
+3. Offline: sign the line package against the private recovery record.
+4. Online: submit the signed transaction.
+
+Only `watch.json`, `lines.json` and the signed transaction cross to the online host. The `.age`
+backup, decrypted profile, recovery record and private key remain offline. Offline signing rejects
+a line package whose network, product or deal ID does not match the recovery record.
+
+## Trust boundary
+
+- Keys originate client-side and are encrypted in the Desk `.age` backup.
+- Forge Sync is not a replacement for a fresh full `.age` export or a separate Safe alarm card.
+- `vaultctl` and `dealctl` recompute covenant identities and fail closed on mismatches.
+- A service capability token is not needed for on-chain recovery.
+- Build from reviewed source and verify the checksum manifests; do not trust cached or third-party
+  binaries.
+- Lost passwords and lost private keys cannot be recovered by Kaspa Forge.
+
+Delete plaintext recovery material when finished:
+
+```bash
+rm -f profile.json vault.json deal-recovery.json
 ```
