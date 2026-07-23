@@ -1,7 +1,8 @@
 # Kaspa Forge — contracts, apps and recovery kit
 
-This is the public source mirror behind **Kaspa Forge — Safe + Escrow + Deposit + Market + Desk**,
-built on Kaspa Toccata covenants.
+This is the public source mirror behind
+**Kaspa Forge — Safe + Escrow + Deposit + Market + Boards + Desk**, built on Kaspa Toccata
+covenants.
 
 - **[Safe](https://kaspaforge.org/safe.html)** — a vault for KAS. Every withdrawal waits out
   a delay you set and can be cancelled with a separate alarm key.
@@ -10,6 +11,8 @@ built on Kaspa Toccata covenants.
   a fixed term, a claim window and covenant-enforced settlement paths.
 - **[Market](https://kaspaforge.org/market.html)** — a marketplace powered by Kaspa payments
   and escrow.
+- **[Boards](https://kaspaforge.org/boards.html)** — signed on-chain threads with a standalone,
+  infrastructure-neutral KBRD indexer in this repository.
 - **[Desk](https://kaspaforge.org/desk.html)** — the browser workspace for the wallet, safes,
   escrow deals, deposits, listings and opt-in encrypted profile sync.
 
@@ -28,6 +31,10 @@ This repository contains:
   a vault against any Kaspa v2+ node with `--utxoindex`, without the Kaspa Forge website or API.
 - [`contracts/vault.sil`](contracts/vault.sil) and
   [`contracts/escrow.sil`](contracts/escrow.sil) — the on-chain covenant sources.
+- [`board-indexer/`](board-indexer/) — the standalone MIT KBRD v1/v2 indexer: BIP340 verification,
+  deterministic SQLite projection, Kaspa gRPC scanner and read-only API. It contains no hosted
+  image storage, classifier, reports, messaging, operator/admin surface, infrastructure config or
+  secrets.
 - [`web/`](web/) and [`app/`](app/) — the browser frontend and Android wrapper source.
 - [`RECOVERY-SHA256SUMS`](RECOVERY-SHA256SUMS) — checksums generated from the exact recovery kit
   in this revision.
@@ -36,6 +43,11 @@ Recovery capability is intentionally stated narrowly: **Safe has a standalone re
 For Escrow and Deposit, the covenant and browser frontend are public, but a separately packaged
 party-side recovery CLI is not published yet. Do not rely on a cached or third-party `escrowctl`
 binary.
+
+The Boards index can be rebuilt only across history available from the connected node. A normal
+pruned node does not retain the full chain history; use an archival source or retain a current
+SQLite backup for a complete long-running index. KBRD stores only an image hash on-chain, never
+the image bytes or moderation state.
 
 ## Keep an offline copy now
 
