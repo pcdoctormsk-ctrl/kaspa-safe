@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Центр безопасности — Kaspa Forge</title>
-<meta name="description" content="Центр безопасности Kaspa Forge: некостодиальная модель доверия, открытые ковенанты сейфа и эскроу с их SHA-256, как самому проверить контракт, публичные ключи арбитра и fee-адрес, покрытие тестами, воспроизводимые сборки, известные ограничения и ответственное раскрытие уязвимостей.">
+<meta name="description" content="Центр безопасности Kaspa Forge: некостодиальная модель доверия, хеши открытых ковенантов, независимое восстановление через vaultctl и dealctl, актуальные тесты, ограничения и responsible disclosure.">
 <link rel="canonical" href="https://kaspaforge.org/ru/security.html">
 <link rel="alternate" hreflang="en" href="https://kaspaforge.org/security.html">
 <link rel="alternate" hreflang="ru" href="https://kaspaforge.org/ru/security.html">
@@ -32,7 +32,7 @@
 <div style="max-width:820px;margin:36px auto 0">
   <div class="eyebrow">Безопасность</div>
   <h1 style="font-size:clamp(28px,4vw,40px);margin:10px 0 8px">Центр безопасности</h1>
-  <p class="hint">Всё, от чего зависит, можно ли доверить Kaspa Forge деньги, — в одном месте: реальные хеши, ключи и цифры тестов и то, как каждую из них проверить самому. Kaspa Forge — <b>некостодиальный</b> сервис: средства лежат в открытых ончейн-ковенантах, и эта страница — попытка сделать это проверяемым, а не обещанием на словах. <b>Последняя сверка: 13 июля 2026.</b> Контакт по безопасности: <a href="mailto:kaspa@officeforge.co">kaspa@officeforge.co</a> · <a href="/.well-known/security.txt">security.txt</a>.</p>
+  <p class="hint">Всё, от чего зависит, можно ли доверить Kaspa Forge деньги, — в одном месте: реальные хеши, ключи и цифры тестов и то, как каждую из них проверить самому. Kaspa Forge — <b>некостодиальный</b> сервис: средства лежат в открытых ончейн-ковенантах, и эта страница — попытка сделать это проверяемым, а не обещанием на словах. <b>Последняя сверка: 23 июля 2026.</b> Контакт по безопасности: <a href="mailto:kaspa@officeforge.co">kaspa@officeforge.co</a> · <a href="/.well-known/security.txt">security.txt</a>.</p>
 
   <div class="note alarm" style="margin-top:20px">Оба ковенанта открыты и не проходили внешний аудит — они прошли наши ончейн- и adversarial-тесты, но внешнего аудита ещё не было. Некостодиально: мы никогда не держим ваши средства, и никакая поддержка не может отменить транзакцию, поэтому используйте суммы, которые вы готовы доверить коду.</div>
 
@@ -60,7 +60,7 @@
       <li><b>Вотчер — сервис liveness, а не кастодиан.</b> Он следит за цепочкой, публикует уже подписанные keyless-пути (авто-релиз, наследование, timeout) и шлёт алерты — ключа, способного перенаправить средства, у него нет.</li>
       <li><b>Ковенанты только P2PK и несоставляемы.</b> Выходы биндятся к простым pay-to-pubkey-скриптам; ковенанты нельзя сцепить или обернуть в больший контракт, меняющий их правила.</li>
       <li><b>Single-input на каждом пути.</b> Каждый вход обоих ковенантов утверждает <span class="mono">tx.inputs.length == 1</span> и ончейн-cap бюджета комиссии (0,1 KAS), закрывая multi-UTXO-сифон и не давая сжечь переход в сетевую комиссию.</li>
-      <li><b>Сервис — удобство, а не зависимость.</b> Если наш сайт исчезнет, ваши средства — нет: контракты живут ончейн и управляются из полного зашифрованного <span class="mono">.age</span>-профиля через офлайн-дешифратор и <span class="mono">vaultctl</span> против любой ноды Kaspa — см. <a href="#incident">§10</a>.</li>
+      <li><b>Сервис — удобство, а не зависимость.</b> Если наш сайт исчезнет, ваши средства — нет: контракты живут ончейн. Для сейфа есть офлайн-дешифратор и <span class="mono">vaultctl</span>; для Гаранта и Залога — публичный <span class="mono">recovery-kit/dealctl</span>. Оба контура работают через независимую ноду Kaspa — см. <a href="#incident">§10</a>.</li>
     </ul>
     <p style="margin-top:12px" class="hint">Полная архитектура и аннотированный список инвариантов — в <a href="/ru/docs/">документации</a>; исходники контрактов ниже — источник истины.</p>
   </div>
@@ -88,18 +88,21 @@
 
   <div class="plate" id="verify">
     <h2 style="font-size:20px">3. Проверьте контракт сами</h2>
-    <p>Всё для проверки ковенантов открыто в <a href="https://github.com/Kaspaforge/kaspaforge" target="_blank" rel="noopener">github.com/Kaspaforge/kaspaforge</a>: оба <span class="mono">.sil</span>-исходника, CLI <span class="mono">vaultctl</span> / <span class="mono">escrowctl</span>, веб-фронт и исходник Android-обёртки.</p>
+    <p>Всё для независимой проверки и восстановления стороны открыто в <a href="https://github.com/Kaspaforge/kaspaforge" target="_blank" rel="noopener">github.com/Kaspaforge/kaspaforge</a>: оба <span class="mono">.sil</span>-исходника, <span class="mono">vaultctl</span> для Сейфа и hosted-free <a href="https://github.com/Kaspaforge/kaspaforge/tree/main/recovery-kit" target="_blank" rel="noopener"><span class="mono">recovery-kit</span></a> с общим Rust-ядром и <span class="mono">dealctl</span> для Гаранта и Залога. Операторский <span class="mono">escrowctl</span> не выдаётся за публичный recovery-инструмент.</p>
     <p style="margin-top:12px"><b>Сверьте хеш исходника</b> с тем, что заявлено на этой странице:</p>
     <div class="cmd"><pre><span class="c"># после клонирования репозитория</span>
 <span class="p">sha256sum contracts/vault.sil contracts/escrow.sil</span>
 <span class="c"># ожидается:</span>
 <span class="c"># a47cb298f60d688427585f9f7b443fddd3bef44c6ec87ebf35648897f7d0220b  contracts/vault.sil</span>
 <span class="c"># 65d4b6bb3c516647b72a873dab1272445c498f8b17bfba19ec15519726dcb4a0  contracts/escrow.sil</span></pre></div>
-    <p style="margin-top:14px"><b>Прогоните ковенанты в настоящей VM Kaspa.</b> CLI компилируют ковенант закреплённым компилятором Silverscript (<span class="mono">rev d25bd34</span>) и исполняют каждый путь траты — включая атаки (досрочное завершение, неверный ключ, неверный адрес, преждевременное наследование, migrate одним ключом, multi-input-сифон) — внутри реальной VM ноды Kaspa, с консенсусным лимитом compute-budget:</p>
+    <p style="margin-top:14px"><b>Запустите публичные проверочные наборы.</b> Тулинг закрепляет Silverscript на <span class="mono">rev 26e3b9f</span>. Selftest Сейфа и ядро Deal Recovery исполняют валидные и атакующие пути в VM Kaspa; recovery-векторы дополнительно доказывают, что браузер/WASM, core и CLI выводят одинаковые адреса и байты транзакций:</p>
     <div class="cmd"><pre><span class="c"># нужны Rust (rustup.rs), protobuf-compiler, clang</span>
-<span class="p">cd vaultctl  &amp;&amp; cargo run --release -- selftest</span>   <span class="c"># сейф: 25 проверок</span>
-<span class="p">cd escrowctl &amp;&amp; cargo run --release -- selftest</span>   <span class="c"># эскроу: 52 проверки</span></pre></div>
+<span class="p">cd vaultctl &amp;&amp; cargo run --release -- selftest</span>  <span class="c"># Сейф: 25 проверок</span>
+<span class="p">cd ../recovery-kit</span>
+<span class="p">cargo test --locked -p kaspa-forge-contracts</span>      <span class="c"># 33: unit + VM + parity</span>
+<span class="p">cargo test --locked -p dealctl</span>                    <span class="c"># 33; simnet E2E включается отдельно</span></pre></div>
     <p style="margin-top:14px"><b>Воспроизведите адрес своего сейфа.</b> Офлайн расшифруйте полный <span class="mono">.age</span>-профиль, извлеките запись сейфа как <span class="mono">vault.json</span>, затем выполните <span class="mono">vaultctl status --recovery vault.json</span>. Команда пересоберёт ковенант и напечатает тот же адрес, который пополнил ваш Деск, — доказательство, что задеплоенный script и есть этот исходник, инстанциированный вашими параметрами, без сервера в контуре.</p>
+    <p style="margin-top:14px"><b>Проверьте и восстановите свою сделку, не отдавая ключ онлайн-машине.</b> Офлайн-команда <span class="mono">dealctl watch</span> создаёт публичный watch-файл; онлайн <span class="mono">prepare --watch</span> получает UTXO ковенанта; офлайн-подпись привязывает пакет к recovery-записи; онлайн <span class="mono">submit</span> отправляет уже подписанную транзакцию. Точный четырёхшаговый поток и сверка checksum — в <a href="/ru/recover.html#dealctl">Recovery hub</a>.</p>
   </div>
 
   <div class="plate" id="keys">
@@ -114,20 +117,22 @@
 
   <div class="plate" id="tests">
     <h2 style="font-size:20px">5. Тесты</h2>
-    <p><b>Автоматические тест-наборы (прогон 13 июля 2026).</b> Rust-ядро и сервер несут юнит- и property-тесты по логике ковенантов, вотчеру, кошельку/деривации и конечному автомату сделки:</p>
+    <p><b>Автоматические тест-наборы (измерено 23 июля 2026).</b> Это свежие locked/all-target прогоны. Hosted/runtime-наборы и независимо публикуемые recovery-наборы показаны отдельно, чтобы публичное доказательство не пряталось в одной общей цифре:</p>
     <div style="margin-top:12px">
-      <div class="kv"><span class="k">крейт сервера</span><span class="v">148 passed · 0 failed · 4 ignored</span></div>
-      <div class="kv"><span class="k">wasm-крейт ядра</span><span class="v">32 passed · 0 failed</span></div>
-      <div class="kv"><span class="k">итого</span><span class="v">180 passed · 0 failed</span></div>
+      <div class="kv"><span class="k">крейт сервера</span><span class="v">335 passed · 0 failed · 5 ignored</span></div>
+      <div class="kv"><span class="k">browser/WASM-крейт</span><span class="v">38 passed · 0 failed</span></div>
+      <div class="kv"><span class="k">runtime subtotal</span><span class="v">373 passed · 0 failed</span></div>
+      <div class="kv"><span class="k">публичное recovery-ядро</span><span class="v">33 passed · 0 failed</span></div>
+      <div class="kv"><span class="k">публичный dealctl</span><span class="v">33 passed · 0 failed · 1 opt-in simnet E2E</span></div>
     </div>
-    <p style="margin-top:14px"><b>Selftest контрактов в VM консенсуса.</b> Поверх юнит-тестов ковенанты прогоняются путь-за-путём внутри реальной VM ноды Kaspa (как запустить самому — <a href="#verify">§3</a>): <b>сейф — 25 проверок</b>, <b>эскроу — 52 проверки</b> — каждая с adversarial-кейсами, всё зелёное.</p>
+    <p style="margin-top:14px"><b>Консенсусные и recovery-доказательства.</b> У Сейфа <b>25 публичных VM self-checks</b>. В 33 теста публичного Deal Recovery core входят <b>9 тестов VM Kaspa</b> и <b>2 детерминированных parity-вектора</b>. В релизном ревью также прошёл opt-in hosted-independent simnet E2E по цепочке <span class="mono">extract → verify → watch → prepare → offline sign → submit</span> с точными дельтами ончейн-балансов.</p>
   </div>
 
   <div class="plate" id="builds">
     <h2 style="font-size:20px">6. Воспроизводимые сборки и приложение</h2>
-    <p>WASM-ядро сейфа/эскроу собирается из исходников скриптом <span class="mono">wasm/build.sh</span> (wasm-pack, release), а исходник Android-обёртки остаётся открытым для аудита и локальной сборки.</p>
+    <p>WASM-ядро сейфа/эскроу собирается из исходников скриптом <span class="mono">wasm/build.sh</span> (wasm-pack, release). У Deal Recovery Kit один locked Cargo workspace, fail-closed allowlist, leak-scan всего дерева и <span class="mono">RECOVERY-SHA256SUMS</span>; он собирается из корня репозитория командой <span class="mono">cargo build --release --locked -p dealctl</span>. Hosted-сервер, чат/медиа, модерация, Telegram и operator/admin-поверхности в пакет не входят.</p>
     <div class="note" style="margin-top:14px"><b>Android APK сейчас не распространяется.</b> Предыдущие пакетные сборки сняты, потому что они больше не соответствуют текущему продукту Kaspa Forge. Не устанавливайте старый пакет из кеша или стороннего зеркала; до выхода актуальной сборки используйте браузерную/PWA-версию.</div>
-    <p style="margin-top:12px" class="hint">Веб-приложение работает целиком в браузере; его Content-Security-Policy запрещает любые сетевые соединения, кроме как к этому origin, поэтому ключ нельзя выкрасть даже через инъекцию скрипта.</p>
+    <p style="margin-top:12px" class="hint">Веб-приложение работает в браузере. Content-Security-Policy ограничивает источники скриптов и сетевые назначения и уменьшает последствия инъекции, но не заменяет проверку клиентского кода и независимо проверенный recovery-kit.</p>
   </div>
 
   <div class="plate" id="limits">
@@ -135,6 +140,7 @@
     <p>Честность — часть истории про безопасность. Вот реальные края текущего дизайна:</p>
     <ul style="margin:10px 0 0;padding-left:20px;line-height:1.75;color:var(--ash)">
       <li><b>Ковенанты не проходили аудит.</b> Контракты открыты, но внешнего аудита ещё не было. Эскроу-сделки принудительно от 50 KAS.</li>
+      <li><b>Доставка hosted-веба остаётся поверхностью доверия.</b> Используя живой сайт, вы доверяете этому origin доставку опубликованных клиентских байтов. CSP — эшелон защиты, а не доказательство против скомпрометированного first-party релиза. Храните проверенный recovery-kit и сверяйте его checksum перед аварийной операцией.</li>
       <li><b>Эскроу требует активного покупателя.</b> Спор нужно открыть <i>внутри</i> окна спора. Если окно прошло без спора, средства авто-релизятся продавцу — покупатель обязан успеть.</li>
       <li><b>Потеряли материалы восстановления — потеряли доступ.</b> Аккаунтов и сброса пароля нет. Храните отдельно полный зашифрованный экспорт <span class="mono">.age</span> и пароль к нему; для сейфа с отдельным хранением тревожного ключа сохраните также alarm-карточку. Forge Sync не заменяет резервную копию: он не может инициализировать пустое устройство и никогда не переносит <span class="mono">alarm_sk</span>.</li>
       <li><b>Сервисный токен — это capability.</b> Токен в ключевом файле авторизует управляющие API-вызовы для вашего сейфа/сделки; получивший его может звать эти эндпоинты (двигать средства вне фиксированных путей ковенанта он всё равно не может). Автоматически он не ротируется. Подробности — в <a href="/ru/privacy.html">политике приватности</a>.</li>
@@ -185,7 +191,7 @@
     <p>Поскольку контракты живут ончейн, вы можете действовать, даже если наш сайт недоступен:</p>
     <ul style="margin:10px 0 0;padding-left:20px;line-height:1.75;color:var(--ash)">
       <li><b>Восстановление сейфа (офлайн):</b> локально расшифруйте полный <span class="mono">.age</span>-профиль, извлеките <span class="mono">vault.json</span> и следуйте <a href="/ru/recover.html">гайду по восстановлению сейфа</a>. <span class="mono">vaultctl</span> может сделать чекин, отменить кражу, завершить вывод, вступить в наследство или выполнить migrate против любой ноды Kaspa.</li>
-      <li><b>Восстановление сделки (офлайн):</b> <a href="/ru/recover-escrow.html">гайд по восстановлению эскроу</a> покрывает застрявшую сделку — включая keyless-путь timeout, который выдаёт средства, если арбитр так и не вынес вердикт.</li>
+      <li><b>Восстановление Гаранта или Залога:</b> сверьте checksum опубликованного <a href="https://github.com/Kaspaforge/kaspaforge/tree/main/recovery-kit" target="_blank" rel="noopener"><span class="mono">recovery-kit</span></a>, офлайн извлеките и проверьте сделку, создайте публичный watch-файл без ключа, подготовьте транзакцию онлайн, подпишите офлайн и отправьте онлайн. Следуйте <a href="/ru/recover.html#dealctl">четырёхшаговому гайду dealctl</a>; приватный ключ не должен касаться сетевой машины.</li>
       <li><b>Подозрение на кражу горячего ключа сейфа:</b> тревожным ключом с alarm-карточки или из полного локального профиля отмените текущий вывод, затем сделайте <span class="mono">migrate</span> в свежий сейф. На синхронизированном втором устройстве этого ключа нет, пока вы не импортировали туда полный экспорт с устройства создания.</li>
       <li><b>Нашли баг безопасности:</b> не публикуйте его открыто — пишите на <a href="mailto:kaspa@officeforge.co">kaspa@officeforge.co</a> (см. <a href="#disclosure">§9</a>).</li>
     </ul>

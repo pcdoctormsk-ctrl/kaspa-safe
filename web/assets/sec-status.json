@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-14",
+  "updated": "2026-07-23",
   "versions": {
     "vault": {
       "version": "v3",
@@ -14,21 +14,21 @@
   },
   "tests": {
     "server": {
-      "passed": 148,
+      "passed": 335,
       "failed": 0,
-      "ignored": 4
+      "ignored": 5
     },
     "wasm": {
-      "passed": 32,
+      "passed": 38,
       "failed": 0
     },
     "total": {
-      "passed": 180,
+      "passed": 373,
       "failed": 0
     },
     "vm_selftest": {
       "vault": 25,
-      "escrow": 52
+      "escrow": 9
     }
   },
   "links": {
