@@ -1,5 +1,6 @@
 Cargo.lock
 Cargo.toml
+LICENSE
 cli/dealctl/Cargo.toml
 cli/dealctl/src/commands.rs
 cli/dealctl/src/envelope.rs
@@ -12,10 +13,10 @@ cli/dealctl/src/txbuild.rs
 cli/dealctl/tests/cli.rs
 cli/dealctl/tests/simnet_e2e.rs
 contracts/escrow.sil
-crates/kaspa-forge-contracts/Cargo.toml
-crates/kaspa-forge-contracts/escrow.sil
 crates/kaspa-forge-contracts/.gitignore
+crates/kaspa-forge-contracts/Cargo.toml
 crates/kaspa-forge-contracts/README.md
+crates/kaspa-forge-contracts/escrow.sil
 crates/kaspa-forge-contracts/src/bin/gen_vectors.rs
 crates/kaspa-forge-contracts/src/escrow.rs
 crates/kaspa-forge-contracts/src/lib.rs
@@ -27,7 +28,9 @@ crates/kaspa-forge-contracts/tests/escrow_vm.rs
 crates/kaspa-forge-contracts/tests/vectors.rs
 crates/kaspa-forge-contracts/vectors/v1.json
 keyfile-decrypt.html
-LICENSE
+recovery/README-RU.md
+recovery/README.md
+recovery/fixtures/README.md
 recovery/fixtures/deal-recovery.attack-fee-budget-too-high.json
 recovery/fixtures/deal-recovery.attack-incomplete-missing-sk.json
 recovery/fixtures/deal-recovery.attack-modified-arbiter-key.json
@@ -41,9 +44,6 @@ recovery/fixtures/deal-recovery.attack-wrong-network.json
 recovery/fixtures/deal-recovery.attack-wrong-party-key.json
 recovery/fixtures/deal-recovery.attack-wrong-role.json
 recovery/fixtures/deal-recovery.valid.json
-recovery/fixtures/README.md
-recovery/README.md
-recovery/README-RU.md
 recovery/schema/deal-recovery-v1.schema.json
 recovery/schema/line-package-v1.schema.json
 recovery/schema/mutual-signature-v1.schema.json

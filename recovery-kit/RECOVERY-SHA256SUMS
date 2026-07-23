@@ -1,5 +1,7 @@
 c15035b0a2f85e304c1d29bfa64c38b1665201df7bd43ae424d32731677feebe  ./Cargo.lock
 1902d4501fcec0b67cf68c6aba0cecc24773ebbae451580328741fe5817ea868  ./Cargo.toml
+276b074451a07f712c152f6331824ade595f0c32b326defd571b8198df584d24  ./EXPECTED-FILES.txt
+4adc266314ae26523684fd84f1e2fe0ace4250fc797b9fcd682cadafab314a69  ./LICENSE
 74482265c7c4c58e45f545d5ac68a3611aa1d6a9f74d9913d1f1e423c35f99d0  ./cli/dealctl/Cargo.toml
 407356b07ecaca7c9c9869b0462b6825174f03eb5fae6ed52ee7c55cdf0aa7b9  ./cli/dealctl/src/commands.rs
 bf6baddde21cb562c047a0543e5eae82ef407d7ee535e6e6d62bd4743a18d3b3  ./cli/dealctl/src/envelope.rs
@@ -12,10 +14,10 @@ b4b3d3101f2763c5433a470a9a6bca41ceaf4faa16341d6493de7b1729424ac4  ./cli/dealctl/
 35eb891fbb794510bae661bc0d15fb11260a5880fad8a22fd1535342ec34904c  ./cli/dealctl/tests/cli.rs
 0c69d29560e6326a3a88065449e957aab8bfdc43995a9375232c9723388ca8b9  ./cli/dealctl/tests/simnet_e2e.rs
 65d4b6bb3c516647b72a873dab1272445c498f8b17bfba19ec15519726dcb4a0  ./contracts/escrow.sil
-e3d1ce77567c269931714205fc62abc0890e6dc1d8de3750d7948b35e5a209ef  ./crates/kaspa-forge-contracts/Cargo.toml
-65d4b6bb3c516647b72a873dab1272445c498f8b17bfba19ec15519726dcb4a0  ./crates/kaspa-forge-contracts/escrow.sil
 b53ee26e6ff1da219b0563333a76d2c9ec19eec713d6ee54e11a1edacb0e9f3d  ./crates/kaspa-forge-contracts/.gitignore
+e3d1ce77567c269931714205fc62abc0890e6dc1d8de3750d7948b35e5a209ef  ./crates/kaspa-forge-contracts/Cargo.toml
 387bf8d46967e4f95d1453cffa38c7369788280ef16d0792403b87a3a423a1f0  ./crates/kaspa-forge-contracts/README.md
+65d4b6bb3c516647b72a873dab1272445c498f8b17bfba19ec15519726dcb4a0  ./crates/kaspa-forge-contracts/escrow.sil
 fee64c16eed720fcb36b26a93307a3010a69d171019afef8917099b847a08960  ./crates/kaspa-forge-contracts/src/bin/gen_vectors.rs
 0a11bc0634ae3f0257db8f882219bae0c6dc3eb36169c7d0173b1d574ea55ac9  ./crates/kaspa-forge-contracts/src/escrow.rs
 d581c22b7a5ff77679ccce8401917da9c142ba8d6f95e4e2174fb17b10e4742f  ./crates/kaspa-forge-contracts/src/lib.rs
@@ -26,9 +28,10 @@ e0315256f643e1f97acad8b7536d1709b8cb174a32257891286a6594d7bcab69  ./crates/kaspa
 04902591244d3e4e348b929cfb8b188de77a27c771bacde67f3c6dcb2146e0c7  ./crates/kaspa-forge-contracts/tests/escrow_vm.rs
 c2b0efb0824d463545cf4b56c630fb8861485b2e415aa409e91ad0d884c6d6b2  ./crates/kaspa-forge-contracts/tests/vectors.rs
 01ac84444fb2c96fa41ea87a3a2a12ed1a3dcccff1e58054770daca0cf92dc58  ./crates/kaspa-forge-contracts/vectors/v1.json
-15ebb6dbaec3626ccf5f9b8c9588743599c152888717c40caee1630531a97149  ./EXPECTED-FILES.txt
 9a6512c4227e6ed504d3821b8030f033d2d599c83926ecd4afe2a7082da79919  ./keyfile-decrypt.html
-4adc266314ae26523684fd84f1e2fe0ace4250fc797b9fcd682cadafab314a69  ./LICENSE
+60a96ac71c4a86d65b698abd87828ec18452494641dde9a6e40ef5e083a76bc0  ./recovery/README-RU.md
+439a907b6eddbe6d9539dae9442e2411d7312a6cb4c042d454066d4cd792aad9  ./recovery/README.md
+465195de7d4b36b9d49d74675121727fbef7dd65f3958ee4bcabf087eb04ad49  ./recovery/fixtures/README.md
 30f86c1d4cdaacaeb37ab57bf2aa53b85e44cec664d97e3a4959b845144e5a08  ./recovery/fixtures/deal-recovery.attack-fee-budget-too-high.json
 def88df5bc86d244baaef6dca68e281c532e2441868253b60d2b48071389a8f5  ./recovery/fixtures/deal-recovery.attack-incomplete-missing-sk.json
 ba4c0937e025076642b58b6d1c1a4cc49fd483d25f453bba293e9e2ce1883058  ./recovery/fixtures/deal-recovery.attack-modified-arbiter-key.json
@@ -42,9 +45,6 @@ cfbb2cbe758d1e9e11bd62707269a4eeacb267c3393980912c5d356f6e24d2be  ./recovery/fix
 42f138ff95346b659c3297be6bd0897fa5618175d36b1f98702c9c0a58afa2b8  ./recovery/fixtures/deal-recovery.attack-wrong-party-key.json
 64839e0ac3114c1223dba2ecdceeb2e0259378e5be432006d71bf804cf3558cf  ./recovery/fixtures/deal-recovery.attack-wrong-role.json
 0b4e3ac2976d74d808b6f9c4c50be51b6f2dc819536e2723e7cde3381344d5e5  ./recovery/fixtures/deal-recovery.valid.json
-465195de7d4b36b9d49d74675121727fbef7dd65f3958ee4bcabf087eb04ad49  ./recovery/fixtures/README.md
-439a907b6eddbe6d9539dae9442e2411d7312a6cb4c042d454066d4cd792aad9  ./recovery/README.md
-60a96ac71c4a86d65b698abd87828ec18452494641dde9a6e40ef5e083a76bc0  ./recovery/README-RU.md
 2721de5135624647c7a99f2cb531cd783ab7fe72e792018c30c8ccbe9a4d1d26  ./recovery/schema/deal-recovery-v1.schema.json
 0bf292d1868d04b9d6ba23c70ad7560d0d37607d73f36d6ee35806506274cea0  ./recovery/schema/line-package-v1.schema.json
 54ad670541e2e4f87ac285d84c948042b3b88f28399c68405277e11c5f097597  ./recovery/schema/mutual-signature-v1.schema.json
